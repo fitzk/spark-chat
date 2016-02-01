@@ -105,4 +105,8 @@ public class ChannelItem extends DynamoDAO {
 //        // List<ChannelMetaDataItem> hi = new ArrayList<ChannelMetaDataItem>;
 //        //  return hi;
     }
+
+    public ChannelStateItem getChannelStateById(String id) {
+        return getMapper().load(ChannelStateItem.class, id);
+    }
 }

@@ -44,4 +44,8 @@ public class DynamoDAO {
     public void setClient(AmazonDynamoDB client) {
         this.client = client;
     }
+
+    public void save(Object obj) {
+        mapper.save(obj);
+    }
 }

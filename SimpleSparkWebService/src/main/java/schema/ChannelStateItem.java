@@ -17,7 +17,7 @@ public class ChannelStateItem {
 
     private String id;
     private String name;
-    private List<Integer> rooms = new ArrayList<>();
+    private List<String> rooms = new ArrayList<>();
 
     @DynamoDBHashKey(attributeName="id")
     public String getId() { return id;}
@@ -28,7 +28,7 @@ public class ChannelStateItem {
     public void setName(String name) { this.name = name; }
 
     @DynamoDBAttribute(attributeName="rooms")
-    public List<Integer> getRooms() { return rooms;}
-    public void setRooms(List<Integer> rooms) { this.rooms = rooms; }
+    public List<String> getRooms() { return rooms;}
+    public void setRooms(List<String> rooms) { this.rooms = rooms; }
 
 }

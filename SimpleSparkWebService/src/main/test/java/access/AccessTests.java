@@ -65,6 +65,38 @@ public class AccessTests {
         System.out.println("new id: "+id);
     }
 
+    @Test
+    public void removeRoomFromChannel() {
+
+        ChannelItem accessor = new ChannelItem();
+        accessor.init(dynamodb);
+
+        // Creating the Channel with 1 room
+        String id = accessor.create("Two Room Channel");
+        ChannelStateItem state = accessor.getChannelStateById(id);
+        assertThat(state.getRooms().size()).isEqualTo(0);
+        String roomId = "r00m";
+        state.getRooms().add(roomId);
+        accessor.save(state);
+
+        // Assert channel has 1 room
+        state = accessor.getChannelStateById(id);
+        assertThat(state.getRooms().size()).isEqualTo(1);
+
+        // Remove room from channel
+        state.getRooms().remove(roomId);
+        accessor.save(state);
+        state = accessor.getChannelStateById(id);
+
+        // Assert remove worked
+        assertThat(state.getRooms()).isEmpty();
+    }
+
+    @Test
+    public void addRoomToChannel() {
+        // TODO:
+    }
+
 
     private void _createTables() throws InterruptedException {
         DynamoDBUtils.createTable(dynamodb, ChannelMetaDataItem.class);
