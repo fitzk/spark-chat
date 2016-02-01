@@ -1,19 +1,7 @@
 import access.ChannelItem;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.TableCollection;
-import com.amazonaws.services.dynamodbv2.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import schema.ChannelMetaDataItem;
 
-
-import java.nio.channels.Channel;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static spark.Spark.*;
 
@@ -67,7 +55,7 @@ public class Main {
             ChannelItem newItem = new ChannelItem();
             ChannelMetaDataItem channelData = mapper.readValue(req.body(), ChannelMetaDataItem.class);
             newItem.setChannelMeta(channelData);
-            newItem.addChannel();
+            newItem.create("foo"/* FIXME: need name */);
             System.out.println("New ChannelItem: " + channelData.getName());
             return 0;
         });
