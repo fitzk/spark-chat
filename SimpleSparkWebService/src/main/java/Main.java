@@ -63,7 +63,7 @@ public class Main {
             ChannelMetaDataItem channelData = mapper.readValue(request.body(), ChannelMetaDataItem.class);
             if(channelData.getName() != null && channelData.getTags() != null){
                 newItem.setChannelMeta(channelData);
-                newItem.addChannel();
+                newItem.create("foo");
                 response.status(201);
                 return "Successfully added "+ newItem.getChannelMeta().getName();
             }else{
