@@ -27,6 +27,10 @@ public class AccessTests {
     private ChatRoomItem chatRoomAccessor;
     private ChannelItem accessor;
 
+    /**
+     * This is run before all tests, it creates necessary tables and sets up db connection
+     * @throws InterruptedException
+     */
     @BeforeClass
     public void setup() throws InterruptedException {
         dynamodb = new AmazonDynamoDBClient();
@@ -45,6 +49,9 @@ public class AccessTests {
         accessor.init(dynamodb);
     }
 
+    /**
+     * This is run after all tests. it destroys the tables
+     */
     @AfterClass
     public void teardown() {
         _deleteTables();
@@ -90,11 +97,8 @@ public class AccessTests {
 
         // Assert remove worked
         assertThat(state.getRooms()).isEmpty();
-
-        try {
-            meta = chatRoomAccessor.getChatRoomMetaDataById(roomId);
-            assertThat(meta).isNull();
-        } catch (Exception e) { /* ignore */ }
+        meta = chatRoomAccessor.getChatRoomMetaDataById(roomId);
+        assertThat(meta).isNull();
     }
 
     @Test
