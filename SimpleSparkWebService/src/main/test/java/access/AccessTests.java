@@ -9,6 +9,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import schema.ChannelMetaDataItem;
 import schema.ChannelStateItem;
+import schema.ChatRoomMetaDataItem;
+import schema.ChatRoomStateItem;
 
 import java.util.List;
 
@@ -53,20 +55,33 @@ public class AccessTests {
     }
 
     @Test
-    public void createChatRoomTest() {
+    public void createChatRoomTest() throws Exception {
         ChatRoomItem accessor = new ChatRoomItem();
-
+        accessor.init(dynamodb);
+        String id = accessor.create("testroom");
+        ChatRoomMetaDataItem meta = accessor.getChatRoomMetaDataById(id);
+        assertThat(id).isNotEmpty();
+        assertThat(meta.getId()).isEqualTo(id);
+        System.out.println("new id: "+id);
     }
 
 
     private void _createTables() throws InterruptedException {
         DynamoDBUtils.createTable(dynamodb, ChannelMetaDataItem.class);
-        Table table = DynamoDBUtils.createTable(dynamodb, ChannelStateItem.class);
+        DynamoDBUtils.createTable(dynamodb, ChannelStateItem.class);
+
+        DynamoDBUtils.createTable(dynamodb, ChatRoomMetaDataItem.class);
+        Table table = DynamoDBUtils.createTable(dynamodb, ChatRoomStateItem.class);
+
         table.waitForActive();
     }
 
     private void _deleteTables() {
         DynamoDBUtils.deleteTable(dynamodb, ChannelMetaDataItem.class);
         DynamoDBUtils.deleteTable(dynamodb, ChannelStateItem.class);
+
+        DynamoDBUtils.deleteTable(dynamodb, ChatRoomMetaDataItem.class);
+        DynamoDBUtils.deleteTable(dynamodb, ChatRoomStateItem.class);
+
     }
 }

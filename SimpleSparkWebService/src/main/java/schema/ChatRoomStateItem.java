@@ -25,16 +25,16 @@ public class ChatRoomStateItem {
 //        @Override public String toString() { return this.stringValue; }
 //    }
 
-    private Integer id;
+    private String id;
     private String name;
     private String dateCreated;
 
     private String state;
-    private Map<Integer,Boolean> users = new HashMap<>();
+    private Map<String,String> users = new HashMap<>();
 
     @DynamoDBHashKey(attributeName="Id")
-    public Integer getId() { return id;}
-    public void setId(Integer id) {this.id = id;}
+    public String getId() { return id;}
+    public void setId(String id) {this.id = id;}
 
     @DynamoDBAttribute(attributeName="Name")
     public String getName() {return name; }
@@ -49,7 +49,7 @@ public class ChatRoomStateItem {
     public void setState(String state ) { this.state = state; }
 
     @DynamoDBAttribute(attributeName="Users")
-    public Map<Integer,Boolean> getUsers() { return users;}
-    public void setUsers(Map<Integer,Boolean> users ) { this.users = users; }
+    public Map<String,String> getUsers() { return users;}
+    public void setUsers(Map<String,String> users ) { this.users = users; }
 
 }

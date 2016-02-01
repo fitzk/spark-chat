@@ -54,9 +54,6 @@ public class ChannelItem extends DynamoDAO {
         data.setName(name);
         data.setDateCreated(now);
         data.setState("Active");
-        Set<String> tags = new HashSet<>();
-        tags.add("stupid");
-        data.setTags(tags);
         getMapper().save(data);
 
         // setting attributes for ChannelState table
