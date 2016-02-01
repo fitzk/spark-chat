@@ -1,7 +1,6 @@
 import access.ChannelItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import schema.ChannelMetaDataItem;
-import schema.ChatRoomMetaDataItem;
 import schema.UserMetaDataItem;
 
 
@@ -63,9 +62,9 @@ public class Main {
             ChannelMetaDataItem channelData = mapper.readValue(request.body(), ChannelMetaDataItem.class);
             if(channelData.getName() != null && channelData.getTags() != null){
                 newItem.setChannelMeta(channelData);
-                newItem.create("foo");
+                String id = newItem.create("foo");
                 response.status(201);
-                return "Successfully added "+ newItem.getChannelMeta().getName();
+                return "Successfully added "+ newItem.getChannelMetaById(id).getName();
             }else{
                 response.status(400);
                 return "Bad Request";

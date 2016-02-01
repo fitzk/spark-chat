@@ -9,7 +9,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import schema.ChannelMetaDataItem;
 import schema.ChannelStateItem;
-import schema.ChatRoomMetaDataItem;
 
 import java.util.List;
 
@@ -31,6 +30,7 @@ public class AccessTests {
         ListTablesResult tables = dynamodb.listTables();
         List<String> names = tables.getTableNames();
         assertThat(names.size()).isNotEqualTo(0);
+        System.out.println("Tables:");
         for(String name:names) {
             System.out.println(name);
         }
@@ -46,6 +46,9 @@ public class AccessTests {
         ChannelItem accessor = new ChannelItem();
         accessor.init(dynamodb);
         String id = accessor.create("testchannel");
+        ChannelMetaDataItem meta = accessor.getChannelMetaById(id);
+        assertThat(id).isNotEmpty();
+        assertThat(meta.getId()).isEqualTo(id);
         System.out.println("new id: "+id);
     }
 

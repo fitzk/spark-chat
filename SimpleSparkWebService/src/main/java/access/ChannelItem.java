@@ -1,15 +1,11 @@
 package access;
 
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
-import com.sun.jmx.snmp.Timestamp;
 import schema.*;
 
 import java.text.SimpleDateFormat;
@@ -26,8 +22,8 @@ public class ChannelItem {
     private ChannelStateItem channelState;
     private DynamoDB dynamoDB;
 
-    public ChannelMetaDataItem getChannelMeta() {
-        return channelMeta;
+    public ChannelMetaDataItem getChannelMetaById(String id) {
+        return mapper.load(ChannelMetaDataItem.class, id);
     }
 
     public void setChannelMeta(ChannelMetaDataItem channelMeta) {
