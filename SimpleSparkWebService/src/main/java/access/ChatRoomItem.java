@@ -22,7 +22,7 @@ public class ChatRoomItem extends DynamoDAO {
     /**
      * @constructor
      */
-    protected ChatRoomItem(){
+    public ChatRoomItem(){
 
     }
 
@@ -51,6 +51,24 @@ public class ChatRoomItem extends DynamoDAO {
      */
     public ChatRoomMetaDataItem getChatRoomMetaDataById(String id) throws Exception {
        return getMapper().load(ChatRoomMetaDataItem.class,id);
+    }
+
+    /**
+     *
+     * @param id
+     * @return ChatRoomMetaDataItem
+     * @throws Exception
+     */
+    public ChatRoomStateItem getChatRoomStateById(String id) throws Exception {
+        return getMapper().load(ChatRoomStateItem.class,id);
+    }
+
+    @Override
+    public void delete(String id) throws Exception {
+        ChatRoomMetaDataItem meta = getChatRoomMetaDataById(id);
+        ChatRoomStateItem state = getChatRoomStateById(id);
+        getMapper().delete(meta);
+        getMapper().delete(state);
     }
 
 }

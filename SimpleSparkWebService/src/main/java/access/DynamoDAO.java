@@ -48,4 +48,7 @@ public class DynamoDAO {
     public void save(Object obj) {
         mapper.save(obj);
     }
+
+    public void delete(String id) throws Exception { mapper.delete(id); };
+
 }

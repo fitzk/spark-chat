@@ -17,6 +17,8 @@ import java.util.*;
 public class ChannelItem extends DynamoDAO {
 
 
+    ChatRoomItem chatRoomAccessor;
+
     public ChannelMetaDataItem getChannelMetaById(String id) {
         return getMapper().load(ChannelMetaDataItem.class, id);
     }
@@ -24,8 +26,8 @@ public class ChannelItem extends DynamoDAO {
     /**
      * @constructor
      */
-    public ChannelItem(){
-
+    public ChannelItem(ChatRoomItem chatRoomAccessor){
+        this.chatRoomAccessor = chatRoomAccessor;
     }
 
     /**
@@ -67,18 +69,22 @@ public class ChannelItem extends DynamoDAO {
     /**
      *
      * @param channel_id
-     * @param room_id
+     * @param roomName
      * @throws Exception
      */
-    protected void addRoomToChannel(Integer channel_id, Integer room_id) throws Exception {
-//        try {
-//                channelState = getChannelStateObject(channel_id);
-//                List<Integer> rooms = channelState.getRooms();
-//                rooms.add(room_id);
-//                channelState.setRooms(rooms);
-//            }catch(Exception e){
-//           //  System.prntln.out(e);
-//        }
+    public String addRoomToChannel(String channel_id, String roomName) throws Exception {
+        ChannelStateItem state = getChannelStateById(channel_id);
+        String room_id = chatRoomAccessor.create(roomName);
+        state.getRooms().add(room_id);
+        save(state);
+        return room_id;
+    }
+
+    public void removeRoomFromChannel(String channel_id, String room_id) throws Exception {
+        chatRoomAccessor.delete(room_id);
+        ChannelStateItem state = getChannelStateById(channel_id);
+        state.getRooms().remove(room_id);
+        save(state);
     }
 
     /**

@@ -1,4 +1,5 @@
 import access.ChannelItem;
+import access.ChatRoomItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import schema.ChannelMetaDataItem;
 import schema.UserMetaDataItem;
@@ -58,7 +59,7 @@ public class Main {
          */
         post("/channel", (request,response)-> {
             ObjectMapper mapper = new ObjectMapper();
-            ChannelItem newItem = new ChannelItem();
+            ChannelItem newItem = new ChannelItem(new ChatRoomItem());
             ChannelMetaDataItem channelData = mapper.readValue(request.body(), ChannelMetaDataItem.class);
             if(channelData.getName() != null){
 //                newItem.setChannelMeta(channelData); /* FIXME: this doesn't follow new ChannelItem spec.

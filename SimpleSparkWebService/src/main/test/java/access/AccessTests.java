@@ -15,6 +15,7 @@ import schema.ChatRoomStateItem;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * Created by phil on 1/31/2016.
@@ -23,6 +24,8 @@ public class AccessTests {
 
 
     private AmazonDynamoDB dynamodb;
+    private ChatRoomItem chatRoomAccessor;
+    private ChannelItem accessor;
 
     @BeforeClass
     public void setup() throws InterruptedException {
@@ -36,6 +39,10 @@ public class AccessTests {
         for(String name:names) {
             System.out.println(name);
         }
+        chatRoomAccessor = new ChatRoomItem();
+        chatRoomAccessor.init(dynamodb);
+        accessor = new ChannelItem(chatRoomAccessor);
+        accessor.init(dynamodb);
     }
 
     @AfterClass
@@ -45,8 +52,6 @@ public class AccessTests {
 
     @Test
     public void createChannelTest() {
-        ChannelItem accessor = new ChannelItem();
-        accessor.init(dynamodb);
         String id = accessor.create("testchannel");
         ChannelMetaDataItem meta = accessor.getChannelMetaById(id);
         assertThat(id).isNotEmpty();
@@ -66,35 +71,41 @@ public class AccessTests {
     }
 
     @Test
-    public void removeRoomFromChannel() {
-
-        ChannelItem accessor = new ChannelItem();
-        accessor.init(dynamodb);
+    public void removeRoomFromChannel() throws Exception {
 
         // Creating the Channel with 1 room
-        String id = accessor.create("Two Room Channel");
-        ChannelStateItem state = accessor.getChannelStateById(id);
-        assertThat(state.getRooms().size()).isEqualTo(0);
-        String roomId = "r00m";
-        state.getRooms().add(roomId);
-        accessor.save(state);
+        String id = accessor.create("One Room Channel");
+        String roomId = accessor.addRoomToChannel(id, "r00m");
+        ChatRoomMetaDataItem meta = chatRoomAccessor.getChatRoomMetaDataById(roomId);
+        assertThat(meta).isNotNull();
+        assertThat(meta.getName()).isEqualTo("r00m");
 
         // Assert channel has 1 room
-        state = accessor.getChannelStateById(id);
+        ChannelStateItem state = accessor.getChannelStateById(id);
         assertThat(state.getRooms().size()).isEqualTo(1);
 
         // Remove room from channel
-        state.getRooms().remove(roomId);
-        accessor.save(state);
+        accessor.removeRoomFromChannel(id, roomId);
         state = accessor.getChannelStateById(id);
 
         // Assert remove worked
         assertThat(state.getRooms()).isEmpty();
+
+        try {
+            meta = chatRoomAccessor.getChatRoomMetaDataById(roomId);
+            assertThat(meta).isNull();
+        } catch (Exception e) { /* ignore */ }
     }
 
     @Test
-    public void addRoomToChannel() {
-        // TODO:
+    public void addRoomToChannel() throws Exception {
+        // Creating the Channel with 1 room
+        String id = accessor.create("Two Room Channel");
+        accessor.addRoomToChannel(id, "r00m");
+        accessor.addRoomToChannel(id, "tw00m");
+
+        ChannelStateItem state = accessor.getChannelStateById(id);
+        assertThat(state.getRooms().size()).isEqualTo(2);
     }
 
 
