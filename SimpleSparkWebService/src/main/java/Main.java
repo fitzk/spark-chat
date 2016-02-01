@@ -1,21 +1,9 @@
 import access.ChannelItem;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.TableCollection;
-import com.amazonaws.services.dynamodbv2.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import schema.ChannelMetaDataItem;
 import schema.ChatRoomMetaDataItem;
 import schema.UserMetaDataItem;
 
-
-import java.nio.channels.Channel;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static spark.Spark.*;
 
