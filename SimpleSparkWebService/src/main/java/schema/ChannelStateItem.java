@@ -19,15 +19,15 @@ public class ChannelStateItem {
     private String name;
     private List<Integer> rooms = new ArrayList<>();
 
-    @DynamoDBHashKey(attributeName="Id")
+    @DynamoDBHashKey(attributeName="id")
     public String getId() { return id;}
     public void setId(String id) {this.id = id;}
 
-    @DynamoDBAttribute(attributeName="Name")
+    @DynamoDBAttribute(attributeName="name")
     public String getName() {return name; }
     public void setName(String name) { this.name = name; }
 
-    @DynamoDBAttribute(attributeName="Rooms")
+    @DynamoDBAttribute(attributeName="rooms")
     public List<Integer> getRooms() { return rooms;}
     public void setRooms(List<Integer> rooms) { this.rooms = rooms; }
 

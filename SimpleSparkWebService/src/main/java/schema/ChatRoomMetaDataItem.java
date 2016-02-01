@@ -19,12 +19,11 @@ public class ChatRoomMetaDataItem {
 
     private Integer id;
     private String name;
-    private Timestamp dateCreated;
-
-    public enum Type { Private, Public };
-    private Type type;
-    public enum State { Active, Inactive };
-    private State state;
+    private String dateCreated;
+    //   public enum Type { Private, Public };
+    private String type;
+//    public enum State { Active, Inactive };
+    private String state;
     private Set<String> tags = new HashSet<>();
 
     @DynamoDBHashKey(attributeName="id")
@@ -35,19 +34,19 @@ public class ChatRoomMetaDataItem {
     public String getName() {return name; }
     public void setName(String name) { this.name = name; }
 
-    @DynamoDBAttribute(attributeName="DateCreated")
-    public Timestamp getDateCreated() { return dateCreated;}
-    public void setDateCreated(Timestamp dateCreated) { this.dateCreated = dateCreated; }
+    @DynamoDBAttribute(attributeName="dateCreated")
+    public String getDateCreated() { return dateCreated;}
+    public void setDateCreated(String dateCreated) { this.dateCreated = dateCreated; }
 
-    @DynamoDBAttribute(attributeName="State")
-    public State getState() { return state;}
-    public void setState(State state ) { this.state = state; }
+    @DynamoDBAttribute(attributeName="state")
+    public String getState() { return state;}
+    public void setState(String state ) { this.state = state; }
 
-    @DynamoDBAttribute(attributeName="Type")
-    public Type getType() { return type;}
-    public void setType( Type type ) { this.type = type; }
+    @DynamoDBAttribute(attributeName="type")
+    public String getType() { return type;}
+    public void setType( String type ) { this.type = type; }
 
-    @DynamoDBAttribute(attributeName="Tags")
+    @DynamoDBAttribute(attributeName="tags")
     public Set<String> getTags() { return tags;}
     public void setTags( Set<String> tags ) { this.tags = tags; }
 

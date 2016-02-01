@@ -73,31 +73,7 @@ public class ChannelItem {
      * @throws Exception
      */
     protected ChannelStateItem getChannelStateObject(Integer id) throws Exception { return mapper.load(ChannelStateItem.class,id);}
-    /**
-     *
-     * @param ChannelName
-     * @param tags
-     */
-    protected String addChannel(String ChannelName,Set<String> tags){
 
-            // setting attributes for ChannelMetaData table
-            channelMeta.setName(ChannelName);
-            java.util.Date date= new java.util.Date();
-            String now = new Timestamp(date.getTime()).toString();
-            channelMeta.setDateCreated(now);
-           // ChannelMetaDataItem.State state = ChannelMetaDataItem.State.Active;
-          //  channelMeta.setState(state);
-            channelMeta.setTags(tags);
-
-            // setting attributes for ChannelState table
-            channelState.setName(ChannelName);
-            String metaId = channelMeta.getId();
-            channelState.setId(metaId);
-
-            mapper.save(channelMeta);
-            mapper.save(channelState);
-            return channelMeta.getId();
-    }
     public String addChannel(){
 
         // setting attributes for ChannelMetaData table
@@ -107,7 +83,6 @@ public class ChannelItem {
         channelMeta.setDateCreated(now);
         String state = "Active";
         channelMeta.setState(state);
-
 
         // setting attributes for ChannelState table
         channelState.setName(channelMeta.getName());
@@ -126,11 +101,11 @@ public class ChannelItem {
      */
     protected void addRoomToChannel(Integer channel_id, Integer room_id) throws Exception {
         try {
-            channelState = getChannelStateObject(channel_id);
-            List<Integer> rooms = channelState.getRooms();
-            rooms.add(room_id);
-            channelState.setRooms(rooms);
-        }catch(Exception e){
+                channelState = getChannelStateObject(channel_id);
+                List<Integer> rooms = channelState.getRooms();
+                rooms.add(room_id);
+                channelState.setRooms(rooms);
+            }catch(Exception e){
            //  System.prntln.out(e);
         }
     }
