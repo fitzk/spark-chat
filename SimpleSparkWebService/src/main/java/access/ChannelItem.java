@@ -1,6 +1,7 @@
 package access;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
@@ -11,17 +12,15 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.sun.jmx.snmp.Timestamp;
 import schema.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by kaylafitzsimmons on 1/31/16.
  */
 public class ChannelItem {
 
-    private AmazonDynamoDBClient client;
+    private AmazonDynamoDB client;
     private DynamoDBMapper mapper;
     private ChannelMetaDataItem channelMeta;
     private ChannelStateItem channelState;
@@ -48,13 +47,14 @@ public class ChannelItem {
      */
     public ChannelItem(){
 
+    }
 
-        client = new AmazonDynamoDBClient(new ProfileCredentialsProvider());
+    public void init(AmazonDynamoDB client) {
+        this.client = client;
         mapper = new DynamoDBMapper(client);
         channelMeta= new ChannelMetaDataItem();
         channelState = new ChannelStateItem();
         dynamoDB = new DynamoDB(client);
-
     }
 
     /**
@@ -78,7 +78,7 @@ public class ChannelItem {
      * @param ChannelName
      * @param tags
      */
-    protected String addChannel(String ChannelName,Set<String> tags){
+    protected String create(String ChannelName, Set<String> tags){
 
             // setting attributes for ChannelMetaData table
             channelMeta.setName(ChannelName);
@@ -98,25 +98,27 @@ public class ChannelItem {
             mapper.save(channelState);
             return channelMeta.getId();
     }
-    public String addChannel(){
+    public String create(String name){
 
         // setting attributes for ChannelMetaData table
-
-        java.util.Date date= new java.util.Date();
-        String now = new Timestamp(date.getTime()).toString();
-        channelMeta.setDateCreated(now);
-        String state = "Active";
-        channelMeta.setState(state);
-
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        String now = df.format(new Date());
+        ChannelMetaDataItem data = new ChannelMetaDataItem();
+        data.setName(name);
+        data.setDateCreated(now);
+        data.setState("Active");
+        Set<String> tags = new HashSet<>();
+        tags.add("stupid");
+        data.setTags(tags);
+        mapper.save(data);
 
         // setting attributes for ChannelState table
-        channelState.setName(channelMeta.getName());
-        String metaId = channelMeta.getId();
-        channelState.setId(metaId);
-
-        mapper.save(channelMeta);
-        mapper.save(channelState);
-        return channelMeta.getId();
+        ChannelStateItem state = new ChannelStateItem();
+        state.setId(data.getId());
+        state.setName(name);
+        state.setRooms(new ArrayList<>());
+        mapper.save(state);
+        return data.getId();
     }
     /**
      *
