@@ -1,6 +1,7 @@
 package access;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.document.*;
@@ -27,16 +28,16 @@ public class ChatRoomItem {
      */
     protected ChatRoomItem(){
 
-
-        client = new AmazonDynamoDBClient(new ProfileCredentialsProvider());
-        mapper = new DynamoDBMapper(client);
-        chatRoomMeta = new ChatRoomMetaDataItem();
-        chatRoomState = new ChatRoomStateItem();
-        chatRoomContent = new ChatRoomContentItem();
-        dynamoDB = new DynamoDB(client);
-
     }
 
+//    public void init() {
+//        this.client = client;
+//        mapper = new DynamoDBMapper(client);
+//        chatRoomMeta = new ChatRoomMetaDataItem();
+//        chatRoomState = new ChatRoomStateItem();
+//        chatRoomContent = new ChatRoomContentItem();
+//        dynamoDB = new DynamoDB(client);
+//    }
     /**
      *
      * @param id

@@ -61,7 +61,7 @@ public class Main {
             ChannelItem newItem = new ChannelItem();
             ChannelMetaDataItem channelData = mapper.readValue(request.body(), ChannelMetaDataItem.class);
             if(channelData.getName() != null && channelData.getTags() != null){
-                newItem.setChannelMeta(channelData);
+//                newItem.setChannelMeta(channelData); /* FIXME: this doesn't follow new ChannelItem spec.
                 String id = newItem.create("foo");
                 response.status(201);
                 return "Successfully added "+ newItem.getChannelMetaById(id).getName();

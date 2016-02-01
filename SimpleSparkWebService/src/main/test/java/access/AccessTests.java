@@ -52,6 +52,12 @@ public class AccessTests {
         System.out.println("new id: "+id);
     }
 
+    @Test
+    public void createChatRoomTest() {
+        ChatRoomItem accessor = new ChatRoomItem();
+
+    }
+
 
     private void _createTables() throws InterruptedException {
         DynamoDBUtils.createTable(dynamodb, ChannelMetaDataItem.class);

@@ -14,28 +14,11 @@ import java.util.*;
 /**
  * Created by kaylafitzsimmons on 1/31/16.
  */
-public class ChannelItem {
+public class ChannelItem extends DynamoDAO {
 
-    private AmazonDynamoDB client;
-    private DynamoDBMapper mapper;
-    private ChannelMetaDataItem channelMeta;
-    private ChannelStateItem channelState;
-    private DynamoDB dynamoDB;
 
     public ChannelMetaDataItem getChannelMetaById(String id) {
-        return mapper.load(ChannelMetaDataItem.class, id);
-    }
-
-    public void setChannelMeta(ChannelMetaDataItem channelMeta) {
-        this.channelMeta = channelMeta;
-    }
-
-    public ChannelStateItem getChannelState() {
-        return channelState;
-    }
-
-    public void setChannelState(ChannelStateItem channelState) {
-        this.channelState = channelState;
+        return getMapper().load(ChannelMetaDataItem.class, id);
     }
 
     /**
@@ -45,14 +28,6 @@ public class ChannelItem {
 
     }
 
-    public void init(AmazonDynamoDB client) {
-        this.client = client;
-        mapper = new DynamoDBMapper(client);
-        channelMeta= new ChannelMetaDataItem();
-        channelState = new ChannelStateItem();
-        dynamoDB = new DynamoDB(client);
-    }
-
     /**
      * Returns a channel meta data object
      * @param id
@@ -60,7 +35,7 @@ public class ChannelItem {
      * @throws Exception
      */
     protected ChannelMetaDataItem getChannelMetaDataObject(Integer id) throws Exception {
-        return mapper.load(ChannelMetaDataItem.class,id);
+        return getMapper().load(ChannelMetaDataItem.class,id);
     }
     /**
      *
@@ -68,7 +43,7 @@ public class ChannelItem {
      * @return ChannelStateItem
      * @throws Exception
      */
-    protected ChannelStateItem getChannelStateObject(Integer id) throws Exception { return mapper.load(ChannelStateItem.class,id);}
+    protected ChannelStateItem getChannelStateObject(Integer id) throws Exception { return getMapper().load(ChannelStateItem.class,id);}
 
     public String create(String name){
 
@@ -82,14 +57,14 @@ public class ChannelItem {
         Set<String> tags = new HashSet<>();
         tags.add("stupid");
         data.setTags(tags);
-        mapper.save(data);
+        getMapper().save(data);
 
         // setting attributes for ChannelState table
         ChannelStateItem state = new ChannelStateItem();
         state.setId(data.getId());
         state.setName(name);
         state.setRooms(new ArrayList<>());
-        mapper.save(state);
+        getMapper().save(state);
         return data.getId();
     }
     /**
@@ -99,14 +74,14 @@ public class ChannelItem {
      * @throws Exception
      */
     protected void addRoomToChannel(Integer channel_id, Integer room_id) throws Exception {
-        try {
-                channelState = getChannelStateObject(channel_id);
-                List<Integer> rooms = channelState.getRooms();
-                rooms.add(room_id);
-                channelState.setRooms(rooms);
-            }catch(Exception e){
-           //  System.prntln.out(e);
-        }
+//        try {
+//                channelState = getChannelStateObject(channel_id);
+//                List<Integer> rooms = channelState.getRooms();
+//                rooms.add(room_id);
+//                channelState.setRooms(rooms);
+//            }catch(Exception e){
+//           //  System.prntln.out(e);
+//        }
     }
 
     /**
@@ -116,21 +91,21 @@ public class ChannelItem {
      * @throws Exception
      */
     protected void deleteChannel(Integer channelId, String tableName) throws Exception {
-        channelMeta = getChannelMetaDataObject(channelId);
-        mapper.generateDeleteTableRequest(ChannelMetaDataItem.class);
+//        channelMeta = getChannelMetaDataObject(channelId);
+//        getMapper().generateDeleteTableRequest(ChannelMetaDataItem.class);
     }
 
     protected void getAllChannels(){
-        ScanRequest scanRequest = new ScanRequest()
-                .withTableName("ChannelMetaData");
-
-        ScanResult result = client.scan(scanRequest);
-
-        for (Map<String, AttributeValue> item : result.getItems()) {
-            //item);
-        }
-        // edit this!!!
-        // List<ChannelMetaDataItem> hi = new ArrayList<ChannelMetaDataItem>;
-        //  return hi;
+//        ScanRequest scanRequest = new ScanRequest()
+//                .withTableName("ChannelMetaData");
+//
+////        ScanResult result = client.scan(scanRequest);
+//
+//        for (Map<String, AttributeValue> item : result.getItems()) {
+//            //item);
+//        }
+//        // edit this!!!
+//        // List<ChannelMetaDataItem> hi = new ArrayList<ChannelMetaDataItem>;
+//        //  return hi;
     }
 }
