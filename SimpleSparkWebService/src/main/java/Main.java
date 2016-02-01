@@ -28,33 +28,33 @@ public class Main {
         /**
          * Returns all users
          */
-        get("/User", (req, res) -> {
+        get("/user", (req, res) -> {
             System.out.println(req);
             return res;
         });
         /**
          * Updates a user based on an ID
          */
-        post("/User", (req,res)-> {
+        post("/user", (req,res)-> {
             return 0;
         });
         /**
          * Deletes a user based on id
          */
-        delete("/User", (req,res)-> {
+        delete("/user", (req,res)-> {
             return 0;
         });
         /**
          * Adds a user
          */
-        post("/User",(req,res)-> {
+        post("/user",(req,res)-> {
             return 0;
         });
         /**
          * Returns all channels if id is NULL
          * else returns a channel
          */
-        get("/Channel", (req, res) -> {
+        get("/channel", (req, res) -> {
 
             return 0;
         });
@@ -80,11 +80,14 @@ public class Main {
         /**
          * Associates a Channel with a URI
          */
-        put("/Channel", (req,res)-> {
+        put("/channel", (req,res)-> {
             return 0;
         });
 
-
+      get("/chatroom", (req, res) -> {
+       //   System.out.println(req);
+          return "This is a chat application!";
+      });
 
     }
 }
