@@ -42,7 +42,7 @@ public class AccessTests {
     }
 
     @Test
-    public void test() {
+    public void createChannelTest() {
         ChannelItem accessor = new ChannelItem();
         accessor.init(dynamodb);
         String id = accessor.create("testchannel");

@@ -6,9 +6,7 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.*;
 
-/**
- * Unit test for simple App.
- */
+
 public class DynamoDBUtils
 {
 
