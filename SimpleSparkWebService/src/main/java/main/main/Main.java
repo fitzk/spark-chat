@@ -227,14 +227,50 @@ public class Main {
             }
         });
         /**
-         * Updates a chatroom
+         * Updates a chatroom name
          */
         put("channel/:channelid/chatroom/:id", (request, response) -> {
             String roomid = request.params(":id");
             String channelid = request.params(":channelid");
+
           //  channelAccessor.removeRoomFromChannel(channelid,roomid);
-            response.status(200);
-            return "Successfully deleted "+ roomid +"!";
+            ObjectMapper mapper = new ObjectMapper();
+            String id = request.params(":id");
+            ChatRoomMetadataItem updated = mapper.readValue(request.body(), ChatRoomMetadataItem.class);
+
+            String name = updated.getName();
+            System.out.println(name);
+            if(name != null){
+                ChannelMetadataItem meta = channelAccessor.getChannelMetaById(channelid);
+                if(meta != null) {
+                    ChatRoomMetadataItem old = chatRoomAccessor.getChatRoomMetaDataById(roomid);
+                    if(old != null) {
+                        channelAccessor.removeRoomFromChannel(channelid, roomid);
+                        channelAccessor.addRoomToChannel(channelid, name);
+                        chatRoomAccessor.delete(roomid);
+                        chatRoomAccessor.create(name);
+                        updated.setId(name);
+                        updated.setDateCreated(old.getDateCreated());
+                        updated.setType(old.getType());
+                        updated.setState(old.getState());
+                        chatRoomAccessor.save(updated);
+                        response.status(200);
+                        return "Successfully updated " + name;
+
+                    }else{
+                        response.status(400);
+                        return "Bad Request";
+                    }
+
+
+                }else{
+                    response.status(404);
+                    return "Can't find channel!";
+                }
+            }else{
+                response.status(400);
+                return "Can't find chat room!";
+            }
         });
         /**
          * Deletes a chatroom
