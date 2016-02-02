@@ -1,5 +1,6 @@
 target/
 .idea
+SimpleSparkWebService/nohup.out
 SimpleSparkWebService/target
 SimpleSparkWebService/.idea
 SimpleSparkWebService/SimpleSparkWebService.iml
