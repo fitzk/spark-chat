@@ -306,7 +306,7 @@ public class Main {
     }
     public static void setup() throws InterruptedException {
         dynamodb = new AmazonDynamoDBClient();
-        dynamodb.setEndpoint("http://localhost:8000/");
+        //dynamodb.setEndpoint("http://localhost:8000/");
         _createTables();
         ListTablesResult tables = dynamodb.listTables();
         List<String> names = tables.getTableNames();
