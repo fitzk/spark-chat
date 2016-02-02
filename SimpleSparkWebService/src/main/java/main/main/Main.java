@@ -9,7 +9,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import main.main.DynamoDBUtils;
 import schema.*;
 
 import java.util.List;
@@ -34,7 +33,6 @@ public class Main {
 
 
         get("/", (request, res) -> {
-
             return "This is a chat application!";
         });
         /**
@@ -64,14 +62,18 @@ public class Main {
                 return "User "+ userUpdated.getUsername()+" was successfully updated.";
         });
         get("/user/:id", (request,response)-> {
-            return "found you! "+request.params("id");
+            String id = request.params(":id");
+            UserItem user = userAccessor.read(id);
+            ObjectMapper mapper = new ObjectMapper();
+            if(user != null) {
+                String userstr = mapper.writeValueAsString(user);
+                return "found you: " + userstr;
+            }else{
+                response.status(404);
+                return "Sorry you don't exsist!";
+            }
         });
-        /**
-         * Returns all users
-         */
-        get("/users", (request,response)-> {
-            return 0;
-        });
+
         /**
          * Deletes a user based on id
          */
@@ -185,9 +187,9 @@ public class Main {
          */
         get("/chatroom/:id", (request, response) -> {
             String id = request.params(":id");
-            if(id!= null){
+            ChatRoomMetadataItem meta = chatRoomAccessor.getChatRoomMetaDataById(id);
+            if(meta != null){
                 ObjectMapper mapper = new ObjectMapper();
-                ChatRoomMetadataItem meta = chatRoomAccessor.getChatRoomMetaDataById(id);
                 String metastring = mapper.writeValueAsString(meta);
                 ChatRoomStateItem state = chatRoomAccessor.getChatRoomStateById(id);
                 String statestring = mapper.writeValueAsString(state);
@@ -196,8 +198,8 @@ public class Main {
                 response.status(200);
                 return "[ "+metastring + "," + statestring+ "," + contentstring + " ]";
             }else{
-                response.status(400);
-                return "Bad Request";
+                response.status(404);
+                return "Not Found";
             }
         });
         /**
@@ -228,9 +230,11 @@ public class Main {
          * Updates a chatroom
          */
         put("channel/:channelid/chatroom/:id", (request, response) -> {
-
-            String id = request.params(":id");
-            return 0;
+            String roomid = request.params(":id");
+            String channelid = request.params(":channelid");
+          //  channelAccessor.removeRoomFromChannel(channelid,roomid);
+            response.status(200);
+            return "Successfully deleted "+ roomid +"!";
         });
         /**
          * Deletes a chatroom
@@ -242,13 +246,6 @@ public class Main {
             channelAccessor.removeRoomFromChannel(channelid,roomid);
             response.status(200);
             return "Successfully deleted "+ roomid +"!";
-        });
-        /**
-         * gets all messages
-         */
-        get("/messages", (request, response) -> {
-            //   System.out.println(request);
-            return "This is a chat application!";
         });
         /**
          * add a message
@@ -265,8 +262,6 @@ public class Main {
             return "This is a chat application!";
         });
         get("/destroy", (request, response) -> {
-
-
             response.status(404);
             return "Goodbye!";
         });
