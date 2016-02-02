@@ -2,6 +2,12 @@
 
 PRG_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
+function clean_db() {
+  for table in $(aws dynamodb list-tables --output text | awk '{print $2}')
+  do
+    aws dynamodb delete-table --table-name $table
+  done
+}
 
 function build() {
   mvn clean install dependency:copy-dependencies
