@@ -1,3 +1,5 @@
+package main.main;
+
 import access.ChannelDAO;
 import access.ChatRoomDAO;
 import access.MessageDAO;
@@ -7,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import main.main.DynamoDBUtils;
 import schema.*;
 
 import java.util.List;
