@@ -1,25 +1,67 @@
-import access.ChannelItem;
-import access.ChatRoomItem;
+import access.ChannelDAO;
+import access.ChatRoomDAO;
+import access.MessageDAO;
+import access.UserDAO;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import schema.ChannelMetaDataItem;
-import schema.UserMetaDataItem;
+import schema.*;
 
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static spark.Spark.*;
 
 
 public class Main {
-    public static void main(String[] args) {
+
+    private static AmazonDynamoDB dynamodb;
+    private static ChatRoomDAO chatRoomAccessor;
+    private static ChannelDAO channelAccessor;
+    private static UserDAO userAccessor;
+    private static MessageDAO messageAccessor;
+
+
+
+
+    public static void main(String[] args) throws InterruptedException {
+        setup();
+
 
         get("/", (request, res) -> {
-         //   System.out.println(request);
+
             return "This is a chat application!";
         });
         /**
          * Updates a user based on an ID
          */
+        put("/user/:id", (request,response)-> {
+            String id = request.params("id");
+            System.out.println(id);
+            ObjectMapper mapper = new ObjectMapper();
+            UserItem userUpdated = mapper.readValue(request.body(), UserItem.class);
+            userUpdated.setId(userUpdated.getUsername());
+            UserItem original = userAccessor.read(id);
+            if(original == null) {
+                response.status(404);
+                return "The user was not found!";
+            }
+            if(userUpdated.getUsername()==null){
+               userUpdated.setUsername(original.getUsername());
+                userUpdated.setId(original.getUsername());
+            }
+            if(original.getOnline() == null ){
+                userUpdated.setOnline(original.getOnline());
+            }
+                userAccessor.save(userUpdated);
+                userAccessor.delete(original);
+                response.status(200);
+                return "User "+ userUpdated.getUsername()+" was successfully updated.";
+        });
         get("/user/:id", (request,response)-> {
-            return 0;
+            return "found you! "+request.params("id");
         });
         /**
          * Returns all users
@@ -31,41 +73,72 @@ public class Main {
          * Deletes a user based on id
          */
         delete("/user/:id", (request,response)-> {
-            return 0;
+            String id = request.params(":id");
+            userAccessor.delete(id);
+            response.status(200);
+            return "Successfully deleted "+ id +"!";
         });
         /**
          * Adds a user
          */
         post("/user",(request,response)-> {
             ObjectMapper mapper = new ObjectMapper();
-            UserMetaDataItem newUser = mapper.readValue(request.body(),UserMetaDataItem.class);
+            UserItem newUser = mapper.readValue(request.body(), UserItem.class);
             if(newUser.getUsername()!=null){
-                response.status(201);
-                return "User "+newUser.getUsername()+" was successfully created.";
+                UserItem exists = userAccessor.read(newUser.getUsername());
+                if(exists == null) {
+                    String username = newUser.getUsername();
+                    System.out.println("username in main: " + username);
+                    String id = userAccessor.create(username);
+                    System.out.println("id in main: " + id);
+                    response.status(201);
+                    return "User "+newUser.getUsername()+" was successfully created.";
+
+                }else{
+                    response.status(302);
+                    return "Sorry username "+newUser.getUsername()+" already exits!";
+                }
+
             }else{
                 response.status(400);
                 return "Bad Request";
             }
-        });
-        /**
-         *  Returns a channel
-         */
-        get("/channel/:id", (request, response) -> {
-            String id = request.params(":id");
-            return 0;
+
         });
         /**
          * Adds a Channel
          */
         post("/channel", (request,response)-> {
             ObjectMapper mapper = new ObjectMapper();
-            ChannelItem newItem = new ChannelItem(new ChatRoomItem());
-            ChannelMetaDataItem channelData = mapper.readValue(request.body(), ChannelMetaDataItem.class);
+
+            ChannelMetadataItem channelData = mapper.readValue(request.body(), ChannelMetadataItem.class);
+
             if(channelData.getName() != null){
-//                newItem.setChannelMeta(channelData); /* FIXME: this doesn't follow new ChannelItem spec.
-                String id = newItem.create("foo");
-                response.status(201);
-                return "Successfully added "+ newItem.getChannelMetaById(id).getName();
+                channelData.setId(channelData.getName());
+                ChannelMetadataItem exists = channelAccessor.getChannelMetaById(channelData.getId());
+                if(exists == null) {
+                    String id = channelAccessor.create(channelData.getName());
+                    response.status(200);
+                    return "Successfully added " + channelAccessor.getChannelMetaById(id).getName() + " /channel/" + id;
+                }else{
+                    response.status(202);
+                    return "Sorry, That channel name is already taken!";
+                }
+            }else{
+                response.status(400);
+                return "Bad Request";
+            }
+        });
+        /**
+         * Gets a Channel
+         */
+        get("/channel/:id", (request,response)-> {
+            String id = request.params(":id");
+            if(id!= null){
+                ChannelMetadataItem meta = channelAccessor.getChannelMetaById(id);
+                ChannelStateItem state = channelAccessor.getChannelStateById(id);
+                response.status(200);
+                return "{"+ meta.getName()+","+meta.getDateCreated() + "},{"+state.getRooms()+"}";
             }else{
                 response.status(400);
                 return "Bad Request";
@@ -76,32 +149,28 @@ public class Main {
          */
         delete("/channel/:id", (request,response)-> {
             String id = request.params(":id");
-            /*
-            * Insert query to find and delete channel
-            * if (successful){
-            *    response.status(200);
-            *    return "This channel has been deleted.";
-            * }else{
-            *   response.status(400);
-            *   return "Bad Request";
-            * }
-            *
-            * */
-
-            return 0;
+            channelAccessor.delete(id);
+            response.status(200);
+            return "Successfully deleted "+ id +"!";
         });
         /**
-         * Updates a channel
+         * Updates a channel name
          */
         put("/channel/:id", (request,response)-> {
+            ObjectMapper mapper = new ObjectMapper();
             String id = request.params(":id");
-            String name = request.params(":name");
+            ChannelMetadataItem channelUpdated = mapper.readValue(request.body(), ChannelMetadataItem.class);
+            String name = channelUpdated.getName();
             if(name != null){
-                /*
-                *   Insert query for getting channel based on id
-                *   channel.setName(name);
-                * */
-                response.status(201);
+                ChannelMetadataItem meta = channelAccessor.getChannelMetaById(id);
+                meta.setId(name);
+                meta.setName(name);
+                ChannelStateItem state = channelAccessor.getChannelStateById(id);
+                state.setId(name);
+                state.setId(name);
+                channelAccessor.save(meta);
+                channelAccessor.save(state);
+                response.status(200);
                 return "Successfully updated "+ name;
             }else{
                 response.status(400);
@@ -112,48 +181,64 @@ public class Main {
          * Returns a chatroom
          */
         get("/chatroom/:id", (request, response) -> {
-       //   System.out.println(request);
             String id = request.params(":id");
-          return "This is a chat application!";
+            if(id!= null){
+                ObjectMapper mapper = new ObjectMapper();
+                ChatRoomMetadataItem meta = chatRoomAccessor.getChatRoomMetaDataById(id);
+                String metastring = mapper.writeValueAsString(meta);
+                ChatRoomStateItem state = chatRoomAccessor.getChatRoomStateById(id);
+                String statestring = mapper.writeValueAsString(state);
+                ChatRoomContentItem content = chatRoomAccessor.getChatRoomContentById(id);
+                String contentstring = mapper.writeValueAsString(content);
+                response.status(200);
+                return "[ "+metastring + "," + statestring+ "," + contentstring + " ]";
+            }else{
+                response.status(400);
+                return "Bad Request";
+            }
         });
         /**
          *  Add new chatroom
+         *  body: { name(chatroom),type(public/private)}
          */
-        post("/chatroom", (request, response) -> {
-        //   System.out.println(request);
-          return "This is a chat application!";
+        post("channel/:channelid/chatroom", (request, response) -> {
+            ObjectMapper mapper = new ObjectMapper();
+            ChatRoomMetadataItem newRoom = mapper.readValue(request.body(), ChatRoomMetadataItem.class);
+            String channelid = request.params(":channelid");
+            if(newRoom.getName() != null){
+                ChannelMetadataItem channelData = channelAccessor.getChannelMetaById(channelid);
+                if(channelData == null) {
+                   response.status(404);
+                    return "This channel doesn't exist!";
+                }else {
+                    String id = channelAccessor.addRoomToChannel(channelData.getId(),newRoom.getName());
+                    response.status(200);
+                    return "Successfully added " + id ;
+                }
+
+            }else{
+                response.status(400);
+                return "Bad Request";
+            }
         });
         /**
          * Updates a chatroom
          */
-        put("/chatroom/:id", (request, response) -> {
+        put("channel/:channelid/chatroom/:id", (request, response) -> {
 
             String id = request.params(":id");
-         /*   ChatRoomMetaDataItem chatroom =
-            if (book != null) {
-                String newAuthor = request.queryParams("author");
-                String newTitle = request.queryParams("title");
-                if (newAuthor != null) {
-                    book.setAuthor(newAuthor);
-                }
-                if (newTitle != null) {
-                    book.setTitle(newTitle);
-                }
-                return "Book with id '" + id + "' updated";
-            } else {
-                response.status(404); // 404 Not found
-                return "Book not found";
-            }
-            *
-            * */
             return 0;
         });
         /**
          * Deletes a chatroom
+         * body: { channelid }
          */
-        delete("/chatroom/:id", (request, response) -> {
-            //   System.out.println(request);
-            return "This is a chat application!";
+        delete("channel/:channelid/chatroom/:id", (request, response) -> {
+            String roomid = request.params(":id");
+            String channelid = request.params(":channelid");
+            channelAccessor.removeRoomFromChannel(channelid,roomid);
+            response.status(200);
+            return "Successfully deleted "+ roomid +"!";
         });
         /**
          * gets all messages
@@ -176,6 +261,70 @@ public class Main {
             //   System.out.println(request);
             return "This is a chat application!";
         });
+        get("/destroy", (request, response) -> {
 
+
+            response.status(404);
+            return "Goodbye!";
+        });
+
+
+    }
+    public static void setup() throws InterruptedException {
+        dynamodb = new AmazonDynamoDBClient();
+        dynamodb.setEndpoint("http://localhost:8000/");
+        _createTables();
+        ListTablesResult tables = dynamodb.listTables();
+        List<String> names = tables.getTableNames();
+        assertThat(names.size()).isNotEqualTo(0);
+        System.out.println("Tables:");
+        for (String name : names) {
+            System.out.println(name);
+        }
+        // chat room
+        chatRoomAccessor = new ChatRoomDAO();
+        chatRoomAccessor.init(dynamodb);
+
+        // channel
+        channelAccessor = new ChannelDAO(chatRoomAccessor);
+        channelAccessor.init(dynamodb);
+
+        // user
+        userAccessor = new UserDAO();
+        userAccessor.init(dynamodb);
+
+        // message
+        messageAccessor = new MessageDAO();
+        messageAccessor.init(dynamodb);
+    }
+    private static void _createTables() throws InterruptedException {
+        try {
+            DynamoDBUtils.createTable(dynamodb, UserItem.class);
+            DynamoDBUtils.createTable(dynamodb, ChannelMetadataItem.class);
+            DynamoDBUtils.createTable(dynamodb, ChannelStateItem.class);
+            DynamoDBUtils.createTable(dynamodb, ChatRoomMetadataItem.class);
+            DynamoDBUtils.createTable(dynamodb, ChatRoomContentItem.class);
+            DynamoDBUtils.createTable(dynamodb, MessageItem.class);
+            Table table = DynamoDBUtils.createTable(dynamodb, ChatRoomStateItem.class);
+
+            table.waitForActive();
+        }catch(InterruptedException e){
+            System.err.println(e);
+        }
+    }
+
+    private static void _deleteTables() {
+            DynamoDBUtils.deleteTable(dynamodb, UserItem.class);
+            DynamoDBUtils.deleteTable(dynamodb, ChannelMetadataItem.class);
+            DynamoDBUtils.deleteTable(dynamodb, ChannelStateItem.class);
+            DynamoDBUtils.deleteTable(dynamodb, ChatRoomMetadataItem.class);
+            DynamoDBUtils.deleteTable(dynamodb, ChatRoomStateItem.class);
+            DynamoDBUtils.deleteTable(dynamodb, ChatRoomContentItem.class);
+            DynamoDBUtils.deleteTable(dynamodb, MessageItem.class);
+
+
+    }
+    public static void teardown() {
+        _deleteTables();
     }
 }

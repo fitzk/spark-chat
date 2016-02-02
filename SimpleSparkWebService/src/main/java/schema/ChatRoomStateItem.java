@@ -15,15 +15,7 @@ import java.util.*;
 
 @DynamoDBTable(tableName="ChatRoomState")
 public class ChatRoomStateItem {
-//
-//    public enum State {
-//        ACTIVE("ACTIVE"),
-//        INACTIVE("INACTIVE");
-//
-//        private State(String stringValue) { this.stringValue = stringValue; }
-//        private String stringValue;
-//        @Override public String toString() { return this.stringValue; }
-//    }
+
 
     private String id;
     private String name;
@@ -32,24 +24,20 @@ public class ChatRoomStateItem {
     private String state;
     private Map<String,String> users = new HashMap<>();
 
-    @DynamoDBHashKey(attributeName="Id")
+    @DynamoDBHashKey(attributeName="id")
     public String getId() { return id;}
     public void setId(String id) {this.id = id;}
 
-    @DynamoDBAttribute(attributeName="Name")
+    @DynamoDBAttribute(attributeName="name")
     public String getName() {return name; }
     public void setName(String name) { this.name = name; }
 
-    @DynamoDBAttribute(attributeName="DateCreated")
+    @DynamoDBAttribute(attributeName="dateCreated")
     public String getDateCreated() { return dateCreated;}
     public void setDateCreated(String dateCreated) { this.dateCreated = dateCreated; }
 
-    @DynamoDBAttribute(attributeName="State")
+    @DynamoDBAttribute(attributeName="state")
     public String getState() { return state;}
     public void setState(String state ) { this.state = state; }
-
-    @DynamoDBAttribute(attributeName="Users")
-    public Map<String,String> getUsers() { return users;}
-    public void setUsers(Map<String,String> users ) { this.users = users; }
 
 }

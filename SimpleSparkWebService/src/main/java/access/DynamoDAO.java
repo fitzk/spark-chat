@@ -3,11 +3,9 @@ package access;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import schema.ChannelMetaDataItem;
-import schema.ChannelStateItem;
 
 /**
- * Created by phil on 1/31/2016.
+ * Created by kayla on 1/31/2016.
  */
 public class DynamoDAO {
 
@@ -49,6 +47,9 @@ public class DynamoDAO {
         mapper.save(obj);
     }
 
-    public void delete(String id) throws Exception { mapper.delete(id); };
+    public void delete(String id) throws Exception { mapper.delete(id); }
+
+    public void delete(Object obj) throws Exception { mapper.delete(obj); }
+
 
 }

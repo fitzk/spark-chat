@@ -14,25 +14,26 @@ import java.util.List;
 @DynamoDBTable(tableName="ChatRoomContent")
 public class ChatRoomContentItem{
 
-    private Integer id;
-    private Integer metaId;
+    private String id;
     private String name;
-    private List<MessageItem> messages = new ArrayList<>();
+    private List<String> users = new ArrayList<>();
+    private List<String> messages = new ArrayList<>();
 
 
-    @DynamoDBHashKey(attributeName="Id")
-    public Integer getId() { return id;}
-    public void setId(Integer id) { this.id = id; }
+    @DynamoDBHashKey
+    public String getId() { return id;}
+    public void setId(String id) { this.id = id; }
 
-    @DynamoDBAttribute
-    public Integer getMetaId() { return metaId;}
-    public void setMetaId(Integer metaId) {this.metaId = metaId;}
-
-    @DynamoDBAttribute(attributeName="Name")
+    @DynamoDBAttribute(attributeName="name")
     public String getName() {return name; }
     public void setName(String name) { this.name = name; }
 
-    @DynamoDBAttribute(attributeName="Messages")
-    public List<MessageItem> getMessages() {return messages; }
-    public void setName(List<MessageItem> messages) { this.messages = messages; }
+
+    @DynamoDBAttribute(attributeName="users")
+    public List<String> getUsers() { return users;}
+    public void setUsers( List<String>users ) { this.users = users; }
+
+    @DynamoDBAttribute(attributeName="messages")
+    public List<String> getMessages() {return messages; }
+    public void setMessages(List<String> messages) { this.messages = messages; }
 }
